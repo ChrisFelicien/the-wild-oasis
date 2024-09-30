@@ -35,23 +35,26 @@ const FilterButton = styled.button`
   }
 `;
 
-const Filter = () => {
+const Filter = ({ filterField, options }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const currentFilter = searchParams.get(filterField) || options.at(0).value;
 
   const handleClick = (value) => {
-    searchParams.set('discount', value);
+    searchParams.set(filterField, value);
     setSearchParams(searchParams);
   };
 
   return (
     <StyledFilter>
-      <FilterButton onClick={() => handleClick('all')}>All</FilterButton>
-      <FilterButton onClick={() => handleClick('no-Discount')}>
-        No Discount
-      </FilterButton>
-      <FilterButton onClick={() => handleClick('with-discount')}>
-        With Discount
-      </FilterButton>
+      {options.map((option, index) => (
+        <FilterButton
+          key={index}
+          onClick={() => handleClick(option?.value)}
+          active={option.value === currentFilter}
+        >
+          {option.label}
+        </FilterButton>
+      ))}
     </StyledFilter>
   );
 };
