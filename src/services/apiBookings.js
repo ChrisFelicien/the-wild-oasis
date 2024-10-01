@@ -96,12 +96,22 @@ export async function deleteBooking(id) {
   return data;
 }
 
-export const getBookings = async () => {
-  const { data: bookings, error } = await supabase
+export const getBookings = async ({ filter, sortBy }) => {
+  let query = supabase
     .from('bookings')
     .select(
-      'id, created_at, startDate, numNight, endDate, numGuest, status, totalBill, cabins(name), guests(fullName, email) '
+      'id, created_at, startDate, numNights, endDate, numGuests, status, totalPrice, cabins(name), guests(fullName, email) '
     );
+
+  // 1) Filter the data form status
+  if (filter) query = query[filter.method || 'eq'](filter.field, filter.value);
+
+  if (sortBy)
+    query = query.order(sortBy.field, {
+      ascending: sortBy.direction === 'asc',
+    });
+
+  const { data: bookings, error } = await query;
 
   if (error) {
     throw new Error('Something went wrong with getting bookings');

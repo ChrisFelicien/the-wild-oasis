@@ -1,6 +1,6 @@
-import styled from "styled-components";
-import Logo from "./Logo";
-import MainNav from "./MainNav";
+import styled from 'styled-components';
+import Logo from './Logo';
+import MainNav from './MainNav';
 
 const StyledSidebar = styled.aside`
   border-right: 1px solid var(--color-grey-100);
