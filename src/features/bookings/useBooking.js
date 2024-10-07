@@ -8,6 +8,7 @@ const useBooking = () => {
 
   const [field, direction] = sortByRaw.split('-');
 
+  // Filter
   const filterValue = searParams.get('status');
 
   const filter =
@@ -17,16 +18,15 @@ const useBooking = () => {
 
   const sortBy = { field, direction };
 
-  const {
-    isLoading,
-    data: bookings,
-    error,
-  } = useQuery({
-    queryFn: () => getBookings({ filter, sortBy }),
-    queryKey: ['booking', filterValue, sortBy],
+  // pagination
+  const page = !searParams.get('page') ? 1 : Number(searParams.get('page'));
+
+  const { isLoading, data, error } = useQuery({
+    queryFn: () => getBookings({ filter, sortBy, page }),
+    queryKey: ['booking', filterValue, sortBy, page],
   });
 
-  return { isLoading, bookings, error };
+  return { isLoading, data, error };
 };
 
 export default useBooking;

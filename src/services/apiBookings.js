@@ -1,3 +1,4 @@
+import { PAGE_SIZE } from '../utils/constant';
 import { getToday } from '../utils/helpers';
 import supabase from './supabase';
 
@@ -9,7 +10,6 @@ export async function getBooking(id) {
     .single();
 
   if (error) {
-    console.error(error);
     throw new Error('Booking not found');
   }
 
@@ -96,11 +96,12 @@ export async function deleteBooking(id) {
   return data;
 }
 
-export const getBookings = async ({ filter, sortBy }) => {
+export const getBookings = async ({ filter, sortBy, page }) => {
   let query = supabase
     .from('bookings')
     .select(
-      'id, created_at, startDate, numNights, endDate, numGuests, status, totalPrice, cabins(name), guests(fullName, email) '
+      'id, created_at, startDate, numNights, endDate, numGuests, status, totalPrice, cabins(name), guests(fullName, email) ',
+      { count: 'exact' }
     );
 
   // 1) Filter the data form status
@@ -111,11 +112,17 @@ export const getBookings = async ({ filter, sortBy }) => {
       ascending: sortBy.direction === 'asc',
     });
 
-  const { data: bookings, error } = await query;
+  if (page) {
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+
+  const { data: bookings, error, count } = await query;
 
   if (error) {
     throw new Error('Something went wrong with getting bookings');
   }
 
-  return bookings;
+  return { bookings, count };
 };
