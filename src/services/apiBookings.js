@@ -104,6 +104,12 @@ export const getBookings = async ({ filter, sortBy, page }) => {
       { count: 'exact' }
     );
 
+  if (page) {
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+
   // 1) Filter the data form status
   if (filter) query = query[filter.method || 'eq'](filter.field, filter.value);
 
@@ -111,12 +117,6 @@ export const getBookings = async ({ filter, sortBy, page }) => {
     query = query.order(sortBy.field, {
       ascending: sortBy.direction === 'asc',
     });
-
-  if (page) {
-    const from = (page - 1) * PAGE_SIZE;
-    const to = from + PAGE_SIZE - 1;
-    query = query.range(from, to);
-  }
 
   const { data: bookings, error, count } = await query;
 
